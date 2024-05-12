@@ -1,0 +1,17 @@
+# TODO
+- [X] Which-key
+- [X] Nice theme
+- [X] helm-mode
+- [X] Ace-window
+- [X] company mode
+- [X] Magit
+- [X] Projectile
+- [X] expand-region
+- [X] Undotree
+- [X] paranthesis
+- [X] move text
+- [X] iedit mode
+- [X] activity watch
+- [X] OCaml configs
+- [X] Eglot
+- [ ] tags
