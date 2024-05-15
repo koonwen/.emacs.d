@@ -60,7 +60,6 @@
 ;; Load and activate emacs packages. Do this first so that the packages are loaded before
 ;; you start trying to modify them.  This also sets the load path.
 (package-initialize)
-
 (setq package-archive-priorities
       '(("gnu" . 3)
 	("non-gnu" . 2)
@@ -71,7 +70,7 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(require 'use-package-ensure)
+(require 'use-package)
 (setq use-package-always-ensure t)
 
 ;; This should come as a dependency of use-package but put this here
@@ -81,6 +80,19 @@
 ;; ============================================================
 
 ;; Configs
+(defun vsplit-other-window ()
+  "Splits the window vertically and switches to that window."
+  (interactive)
+  (split-window-vertically)
+  (other-window 1 nil))
+(defun hsplit-other-window ()
+  "Splits the window horizontally and switches to that window."
+  (interactive)
+  (split-window-horizontally)
+  (other-window 1 nil))
+
+(bind-key "C-x 2" #'vsplit-other-window)
+(bind-key "C-x 3" #'hsplit-other-window)
 (bind-key "M-S-C-<left>" #'shrink-window-horizontally)
 (bind-key "M-S-C-<right>" #'enlarge-window-horizontally)
 (bind-key "M-S-C-<down>" #'shrink-window)
