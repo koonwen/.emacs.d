@@ -175,7 +175,7 @@
 ;; ========================================
 
 ;; LSP Modes
-(use-package eglot)
+(use-package lsp-mode)
 
 ;; Tools
 (use-package magit
