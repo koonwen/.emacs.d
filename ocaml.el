@@ -33,8 +33,7 @@
   :hook ((tuareg-mode reason-mode) . merlin-eldoc-setup))
 
 (use-package merlin-iedit)
-(use-package dune-flymake)
-(use-package dune)
+(use-package dune-format)
 (use-package ocamlformat
   :commands (ocamlformat ocamlformat-before-save)
   :bind (:map tuareg-mode-map

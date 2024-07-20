@@ -4,6 +4,7 @@
  inhibit-splash-screen t
  indicate-empty-lines t
  global-auto-revert-non-file-buffers t
+ explicit-shell-file-name "/bin/fish"
  ;; Don't beep at me
  visible-bell t
 
@@ -166,11 +167,11 @@
 
 (use-package keycast
   :delight
-  :config (keycast-header-line-mode))
+  :config (keycast-header-line-mode t))
 
 (use-package activity-watch-mode
   :delight
-  :config (global-activity-watch-mode))
+  :config (global-activity-watch-mode -1))
 
 ;; ========================================
 
@@ -201,8 +202,29 @@
 
 (use-package ace-window
   :bind (("M-o" . ace-window)
-	 ("C-M-o" . ace-swap-window)
-	 ("C-M-O" . ace-delete-window)))
+	 ("C-M-O" . ace-swap-window)
+	 ("M-d" . ace-delete-window)))
+
+(use-package avy)
+(use-package key-chord
+  :config
+  (key-chord-define-global "jj" 'avy-goto-word-1)
+  (key-chord-define-global "jl" 'avy-goto-line)
+  (key-chord-define-global "jk" 'avy-goto-char-timer)
+  (key-chord-define-global "JJ" 'crux-switch-to-previous-buffer)
+  (key-chord-define-global "uu" 'undo-tree-visualize)
+  (key-chord-define-global "xx" 'execute-extended-command)
+  ;; Keychord tips not very useful at the moment
+  (defvar key-chord-tips '("Press <jj> quickly to jump to the beginning of a visible word."
+                           "Press <jl> quickly to jump to a visible line."
+                           "Press <jk> quickly to jump to a visible character."
+                           "Press <JJ> quickly to switch to previous buffer."
+                           "Press <uu> quickly to visualize the undo tree."
+                           "Press <xx> quickly to execute extended command."
+                           "Press <yy> quickly to browse the kill ring."))
+  (key-chord-mode 1))
+
+
 
 (use-package crux
   :pin melpa-stable
@@ -210,7 +232,8 @@
 	 ("C-c t" . crux-visit-term-buffer)
 	 ("C-c r" . crux-rename-file-and-buffer)
 	 ("C-c D" . crux-delete-file-and-buffer)
-	 ("C-c I" . crux-find-user-init-file)))
+	 ("C-c I" . crux-find-user-init-file))
+  :custom (crux-shell "/bin/fish"))
 
 (use-package move-text
   :config (move-text-default-bindings))
