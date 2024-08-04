@@ -48,8 +48,16 @@
   ;; Show line numbers on left column
   (global-display-line-numbers-mode t)
 
+  ;; Automatically revert when there are changes
+  (global-auto-revert-mode t)
+
+  ;; Show time
+  (setq display-time-day-and-date t)
+  (setq display-time-mail-string "")
+  (display-time-mode t)
+
   ;; Nice font (Funky on debian, can't find system fonts)
-  (set-frame-font "Fira Code Retina-16" nil t)
+  ;; (set-frame-font "Fira Code Retina-14" nil t)
 
   )
 
@@ -78,9 +86,8 @@
 ;; just to make it obvious we have it
 (use-package bind-key)
 
-;; ============================================================
+;; ======================Configs===============================
 
-;; Configs
 (defun vsplit-other-window ()
   "Splits the window vertically and switches to that window."
   (interactive)
@@ -92,6 +99,35 @@
   (split-window-horizontally)
   (other-window 1 nil))
 
+;; Themes
+(use-package flatland-theme)
+(use-package twilight-bright-theme)
+(use-package zenburn-theme)
+(use-package material-theme)
+(load-theme 'material t)
+
+(defun switch-theme (theme)
+  "Disables any currently active themes and loads THEME."
+  ;; This interactive call is taken from `load-theme'
+  (interactive
+   (list
+    (intern (completing-read "Load custom theme: "
+                             (mapc 'symbol-name
+                                   (custom-available-themes))))))
+  (let ((enabled-themes custom-enabled-themes))
+    (mapc #'disable-theme custom-enabled-themes)
+    (load-theme theme t)))
+
+;; (defun toggle-themes ()
+;;   "Allow quick toggling between dark and light themes."
+;;   (interactive)
+;;   (if (member 'twilight-bright custom-enabled-themes)
+;;       (progn
+;; 	(load-theme 'flatland t)
+;; 	(disable-theme 'twilight-bright))
+;;     (load-theme 'twilight-bright t)
+;;     (disable-theme 'flatland)))
+
 (bind-key "C-x 2" #'vsplit-other-window)
 (bind-key "C-x 3" #'hsplit-other-window)
 (bind-key "M-S-C-<left>" #'shrink-window-horizontally)
@@ -99,13 +135,26 @@
 (bind-key "M-S-C-<down>" #'shrink-window)
 (bind-key "M-S-C-<up>" #'enlarge-window)
 (bind-key "<end>" 'scroll-lock-mode)
+(bind-key "M-[" 'goto-last-change)
+(bind-key "M-]" 'goto-last-change-reverse)
 
 ;; ==================== Background "modes" ====================
 (use-package delight)
 
+(use-package auto-dim-other-buffers
+  :config (auto-dim-other-buffers-mode -1))
+
 (use-package company
   :delight
-  :hook (after-init . global-company-mode))
+  :hook (after-init . global-company-mode)
+  :config
+  (setq company-minimum-prefix-length 1 company-idle-delay 0.0))
+
+(use-package company-quickhelp
+  :commands (company-quickhelp-mode)
+  :ensure t
+  :bind (:map company-active-map
+              ("M-h" . company-quickhelp-manual-begin)))
 
 (use-package smartparens
   :delight
@@ -148,11 +197,16 @@
 	 ("<insert>" . projectile-commander))
   :bind-keymap ("C-c p" . projectile-command-map)
   :custom
+  (projectile-completion-system 'helm)
   (projectile-indexing-method 'hybrid))
+
+(use-package projectile-ripgrep)
 
 (use-package helm-projectile
   :pin melpa
   :config (helm-projectile-on))
+
+(use-package helm-ag)
 
 (use-package beacon
   :delight
@@ -167,7 +221,20 @@
 
 (use-package keycast
   :delight
-  :config (keycast-header-line-mode t))
+  :config
+  (keycast-header-line-mode t)
+  (setq keycast-header-line-format "%2s%k%c%r"))
+
+(use-package treemacs
+  :init (with-eval-after-load 'winum
+	  (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+  :hook (emacs-startup . treemacs)
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)))
+
+(use-package treemacs-projectile
+  :after (treemacs projectile))
 
 (use-package activity-watch-mode
   :delight
@@ -175,25 +242,52 @@
 
 ;; ========================================
 
+;; Icons for lsp
+(use-package all-the-icons
+  :if (display-graphic-p)
+  )
+;; If symbols are not showing, make sure to run
+;; M-x all-the-icons-install-fonts
+
 ;; LSP Modes
 (use-package lsp-mode
   :init (setq lsp-keymap-prefix "C-c l")
+  :bind (("M-." . 'lsp-find-definition)
+	 ("M-r" . 'lsp-find-references))
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+	 (c-mode . lsp)
          ;; (XXX-mode . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
+  :custom ((lsp-modeline-code-actions-segments '(count icon name))
+	   (lsp-headerline-breadcrumb-segments '(project file))
+	   (lsp-headerline-breadcrumb-icons-enable nil)
+	   (lsp-enable-on-type-formatting t)
+	   (lsp-enable-imenu t))
   :commands lsp)
 
-;; optionally
+(use-package yasnippet
+  :hook (lsp-mode . yas-minor-mode))
+
+(use-package flycheck)
+
+(use-package lsp-treemacs
+  :config (lsp-treemacs-sync-mode 1))
+
 (use-package lsp-ui
   :commands lsp-ui-mode
+  :bind ("M-h" . 'lsp-ui-doc-glance)
   :custom
+  (lsp-ui-doc-show-with-cursor nil)
   (lsp-ui-doc-enable t)
   (lsp-ui-doc-position 'at-point)
-  (lsp-ui-sideline-enable nil)
+  (lsp-ui-sideline-enable t)
+  (lsp-ui-sideline-show-code-actions t)
   (lsp-ui-peek-peek-height 5))
+
 ;; if you are helm user
-(use-package helm-lsp :commands helm-lsp-workspace-symbol)
+(use-package helm-lsp
+  :commands helm-lsp-workspace-symbol)
 
 ;; Tools
 (use-package magit
@@ -223,8 +317,6 @@
                            "Press <xx> quickly to execute extended command."
                            "Press <yy> quickly to browse the kill ring."))
   (key-chord-mode 1))
-
-
 
 (use-package crux
   :pin melpa-stable
@@ -257,24 +349,6 @@
   (show-paren-style 'expression)
   (blink-matching-paren-dont-ignore-comments t)
   :config (show-paren-mode))
-
-;; Themes
-(use-package flatland-theme
-  :config (load-theme 'flatland t))
-(use-package twilight-bright-theme)
-(use-package zenburn-theme)
-
-(defun switch-theme (theme)
-  "Disables any currently active themes and loads THEME."
-  ;; This interactive call is taken from `load-theme'
-  (interactive
-   (list
-    (intern (completing-read "Load custom theme: "
-                             (mapc 'symbol-name
-                                   (custom-available-themes))))))
-  (let ((enabled-themes custom-enabled-themes))
-    (mapc #'disable-theme custom-enabled-themes)
-    (load-theme theme t)))
 
 ;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
 (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")

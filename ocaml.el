@@ -37,4 +37,4 @@
 (use-package ocamlformat
   :commands (ocamlformat ocamlformat-before-save)
   :bind (:map tuareg-mode-map
-              ("M-<iso-lefttab>" . ocamlformat)))
+              ("<backtab>" . ocamlformat)))
