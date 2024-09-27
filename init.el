@@ -190,6 +190,9 @@
 	 ("C-x C-b" . helm-buffers-list)
 	 ("C-x r b" . helm-source-filtered-bookmarks)))
 
+(use-package helm-descbinds
+  :config (helm-descbinds-mode t))
+
 (use-package projectile
   :delight
   :config(projectile-mode t)
@@ -209,12 +212,12 @@
 
 (use-package helm-ag)
 
-(use-package beacon
-  :delight
-  :config (beacon-mode t)
-  :custom
-  (beacon-blink-when-focused t)
-  (beacon-color "#f6aa11"))
+;; (use-package beacon
+;;   :delight
+;;   :config (beacon-mode t)
+;;   :custom
+;;   (beacon-blink-when-focused t)
+;; (beacon-color "#f6aa11"))
 
 (use-package which-key
   :delight
@@ -238,6 +241,8 @@
 (use-package treemacs-projectile
   :after (treemacs projectile))
 
+(use-package winner
+  :config (setq winner-mode t))
 ;; (use-package activity-watch-mode
 ;;   :delight
 ;;   :config (global-activity-watch-mode -1))
@@ -328,7 +333,8 @@
 
 (use-package crux
   :pin melpa-stable
-  :bind (("C-k" . crux-smart-kill-line)
+  :bind (([remap move-beginning-of-line] . crux-move-beginning-of-line)
+	 ("C-k" . crux-smart-kill-line)
 	 ("C-c t" . crux-visit-term-buffer)
 	 ("C-c r" . crux-rename-file-and-buffer)
 	 ("C-c D" . crux-delete-file-and-buffer)
