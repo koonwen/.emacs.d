@@ -10,7 +10,7 @@
   :bind (:map merlin-mode-map
               ("M-." . merlin-locate)
               ("M-," . merlin-pop-stack)
-              ("M-?" . merlin-occurrences)
+              ("M-/" . merlin-occurrences)
               ("C-c m j" . merlin-jump)
               ("C-c m i" . merlin-locate-ident)
               ("C-c m e" . merlin-iedit-occurrences)
@@ -23,9 +23,8 @@
   :custom
   (eldoc-echo-area-use-multiline-p t)
   (merlin-eldoc-max-lines 8)
-  (merlin-eldoc-max-lines-function-arguments 1)
   (merlin-eldoc-type-verbosity 'min)
-  (merlin-eldoc-function-arguments nil)
+  (merlin-eldoc-function-arguments t)
   (merlin-eldoc-doc nil)
   :bind (:map merlin-mode-map
               ("C-c m p" . merlin-eldoc-jump-to-prev-occurrence)
@@ -33,6 +32,12 @@
   :hook ((tuareg-mode reason-mode) . merlin-eldoc-setup))
 
 (use-package merlin-iedit)
+
+;; This uses Merlin internally
+(use-package flycheck-ocaml
+  :config
+  (flycheck-ocaml-setup))
+
 (use-package dune-format)
 (use-package ocamlformat
   :commands (ocamlformat ocamlformat-before-save)

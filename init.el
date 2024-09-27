@@ -4,7 +4,7 @@
  inhibit-splash-screen t
  indicate-empty-lines t
  global-auto-revert-non-file-buffers t
- explicit-shell-file-name "/bin/fish"
+ explicit-shell-file-name "/bin/bash"
  ;; Don't beep at me
  visible-bell t
 
@@ -128,6 +128,7 @@
 ;;     (load-theme 'twilight-bright t)
 ;;     (disable-theme 'flatland)))
 
+(bind-key "M-l" 'move-to-window-line-top-bottom)
 (bind-key "C-x 2" #'vsplit-other-window)
 (bind-key "C-x 3" #'hsplit-other-window)
 (bind-key "M-S-C-<left>" #'shrink-window-horizontally)
@@ -135,8 +136,8 @@
 (bind-key "M-S-C-<down>" #'shrink-window)
 (bind-key "M-S-C-<up>" #'enlarge-window)
 (bind-key "<end>" 'scroll-lock-mode)
-(bind-key "M-[" 'goto-last-change)
-(bind-key "M-]" 'goto-last-change-reverse)
+;; (bind-key "M-[" 'goto-last-change)
+;; (bind-key "M-]" 'goto-last-change-reverse)
 
 ;; ==================== Background "modes" ====================
 (use-package delight)
@@ -229,6 +230,7 @@
   :init (with-eval-after-load 'winum
 	  (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
   :hook (emacs-startup . treemacs)
+  :config (setq treemacs-no-png-images t)
   :bind
   (:map global-map
         ("M-0"       . treemacs-select-window)))
@@ -236,35 +238,41 @@
 (use-package treemacs-projectile
   :after (treemacs projectile))
 
-(use-package activity-watch-mode
-  :delight
-  :config (global-activity-watch-mode -1))
+;; (use-package activity-watch-mode
+;;   :delight
+;;   :config (global-activity-watch-mode -1))
 
 ;; ========================================
-
-;; Icons for lsp
-(use-package all-the-icons
-  :if (display-graphic-p)
-  )
-;; If symbols are not showing, make sure to run
-;; M-x all-the-icons-install-fonts
 
 ;; LSP Modes
 (use-package lsp-mode
   :init (setq lsp-keymap-prefix "C-c l")
-  :bind (("M-." . 'lsp-find-definition)
-	 ("M-r" . 'lsp-find-references))
-  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-	 (c-mode . lsp)
-         ;; (XXX-mode . lsp)
-         ;; if you want which-key integration
+  :config
+  ;; The default setting is too low for lsp-mode's needs due to the
+  ;; fact that client/server communication generates a lot of
+  ;; memory/garbage.
+  (setq gc-cons-threshold 100000000)
+  ;; Increase the amount of data which Emacs reads from the process
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
+  (setq lsp-idle-delay 0.5)
+  (setq lsp-log-io nil)
+  (setq lsp-ui-mode nil)
+  :hook ((tuareg-mode . lsp-deferred)
+	 ;; (prog-mode . lsp-deferred)
+	 ;; (c-mode . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration))
+  ;; :bind (("M-." . 'lsp-find-definition)
+  ;; 	 ("M-r" . 'lsp-find-references))
   :custom ((lsp-modeline-code-actions-segments '(count icon name))
 	   (lsp-headerline-breadcrumb-segments '(project file))
 	   (lsp-headerline-breadcrumb-icons-enable nil)
 	   (lsp-enable-on-type-formatting t)
 	   (lsp-enable-imenu t))
-  :commands lsp)
+  :commands (lsp lsp-deferred))
+
+;; If you get connecting issues, run this command to wipe all the
+;; compiled .elc files in .emacs.d/elpa
+;; $ find . -type f -name '*.elc' -delete
 
 (use-package yasnippet
   :hook (lsp-mode . yas-minor-mode))
@@ -274,20 +282,20 @@
 (use-package lsp-treemacs
   :config (lsp-treemacs-sync-mode 1))
 
-(use-package lsp-ui
-  :commands lsp-ui-mode
-  :bind ("M-h" . 'lsp-ui-doc-glance)
-  :custom
-  (lsp-ui-doc-show-with-cursor nil)
-  (lsp-ui-doc-enable t)
-  (lsp-ui-doc-position 'at-point)
-  (lsp-ui-sideline-enable t)
-  (lsp-ui-sideline-show-code-actions t)
-  (lsp-ui-peek-peek-height 5))
+;; (use-package lsp-ui
+;;   :commands lsp-ui-mode
+;;   :bind ("M-h" . 'lsp-ui-doc-glance)
+;;   :custom
+;;   (lsp-ui-doc-show-with-cursor nil)
+;;   (lsp-ui-doc-enable t)
+;;   (lsp-ui-doc-position 'at-point)
+;;   (lsp-ui-sideline-enable t)
+;;   (lsp-ui-sideline-show-code-actions t)
+;;   (lsp-ui-peek-peek-height 5))
 
 ;; if you are helm user
 (use-package helm-lsp
-  :commands helm-lsp-workspace-symbol)
+  :bind ([remap xref-find-apropos] . helm-lsp-workspace-symbol))
 
 ;; Tools
 (use-package magit
