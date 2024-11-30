@@ -45,8 +45,8 @@
   ;; Highlight line on point.
   (global-hl-line-mode t)
 
-  ;; Show line numbers on left column
-  (global-display-line-numbers-mode t)
+  ;; Show line numbers on left column, only in prog mode
+  (add-hook 'prog-mode-hook display-line-numbers-mode)
 
   ;; Automatically revert when there are changes
   (global-auto-revert-mode t)
@@ -58,7 +58,6 @@
 
   ;; Nice font (Funky on debian, can't find system fonts)
   ;; (set-frame-font "Fira Code Retina-14" nil t)
-
   )
 
 ;; ====== Set up use=package and init.el management tools ======
@@ -160,18 +159,17 @@
 (use-package smartparens
   :delight
   :config (require 'smartparens-config)
-  :hook (prog-mode text-mode markdown-mode)
+  :hook ((prog-mode text-mode markdown-mode) . show-smartparens-mode)
   ;; Useful commands
   ;; sp-splice-sexp
   ;; sp-rewrap-sexp
-  :bind (("C-M-a" . sp-beginning-of-sexp)
-	 ("C-M-e" . sp-end-of-sexp)
-
-	 ("C-M-f" . sp-forward-sexp)
+  :bind (("C-M-f" . sp-forward-sexp)
 	 ("C-M-b" . sp-backward-sexp)
-
-	 ("C-M-n" . sp-next-sexp)
-	 ("C-M-p" . sp-previous-sexp)))
+	 ("C-M-n" . sp-down-sexp)
+	 ("C-M-p" . sp-backward-up-sexp)
+	 ("C-M-k" . sp-kill-hybrid-sexp)
+	 ("C-M-u" . sp-splice-sexp)
+	 ("C-M-r" . sp-rewrap-sexp)))
 
 (use-package undo-tree
   :delight
@@ -185,6 +183,7 @@
   :bind (("M-x" . helm-M-x)
 	 ("M-y" . helm-show-kill-ring)
 	 ("C-x C-f" . helm-find-files)
+	 ("C-h a" . helm-apropos)
 	 ("C-c h" . helm-command-prefix)
 	 ("C-x b" . helm-mini)
 	 ("C-x C-b" . helm-buffers-list)
@@ -204,13 +203,9 @@
   (projectile-completion-system 'helm)
   (projectile-indexing-method 'hybrid))
 
-(use-package projectile-ripgrep)
-
 (use-package helm-projectile
   :pin melpa
   :config (helm-projectile-on))
-
-(use-package helm-ag)
 
 ;; (use-package beacon
 ;;   :delight
@@ -229,20 +224,20 @@
   (keycast-header-line-mode t)
   (setq keycast-header-line-format "%2s%k%c%r"))
 
-(use-package treemacs
-  :init (with-eval-after-load 'winum
-	  (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
-  :hook (emacs-startup . treemacs)
-  :config (setq treemacs-no-png-images t)
-  :bind
-  (:map global-map
-        ("M-0"       . treemacs-select-window)))
+;; (use-package treemacs
+;;   :init (with-eval-after-load 'winum
+;; 	  (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+;;   :hook (emacs-startup . treemacs)
+;;   :config (setq treemacs-no-png-images t)
+;;   :bind
+;;   (:map global-map
+;;         ("M-0"       . treemacs-select-window)))
 
-(use-package treemacs-projectile
-  :after (treemacs projectile))
+;; (use-package treemacs-projectile
+;;   :after (treemacs projectile))
 
 (use-package winner
-  :config (setq winner-mode t))
+  :config (setq winner-mode 1))
 ;; (use-package activity-watch-mode
 ;;   :delight
 ;;   :config (global-activity-watch-mode -1))
@@ -320,15 +315,12 @@
   (key-chord-define-global "jk" 'avy-goto-char-timer)
   (key-chord-define-global "JJ" 'crux-switch-to-previous-buffer)
   (key-chord-define-global "uu" 'undo-tree-visualize)
-  (key-chord-define-global "xx" 'execute-extended-command)
   ;; Keychord tips not very useful at the moment
   (defvar key-chord-tips '("Press <jj> quickly to jump to the beginning of a visible word."
                            "Press <jl> quickly to jump to a visible line."
                            "Press <jk> quickly to jump to a visible character."
                            "Press <JJ> quickly to switch to previous buffer."
-                           "Press <uu> quickly to visualize the undo tree."
-                           "Press <xx> quickly to execute extended command."
-                           "Press <yy> quickly to browse the kill ring."))
+                           "Press <uu> quickly to visualize the undo tree."))
   (key-chord-mode 1))
 
 (use-package crux
@@ -339,7 +331,7 @@
 	 ("C-c r" . crux-rename-file-and-buffer)
 	 ("C-c D" . crux-delete-file-and-buffer)
 	 ("C-c I" . crux-find-user-init-file))
-  :custom (crux-shell "/bin/fish"))
+  :custom (crux-shell "/bin/bash"))
 
 (use-package move-text
   :config (move-text-default-bindings))
@@ -354,15 +346,15 @@
 (use-package expand-region
   :bind ("M-=" . er/expand-region))
 
-(use-package paren
-  ;; "Highlighting for parens"
-  :custom
-  (show-paren-delay 0.3)
-  (blink-matching-paren t)
-  (blink-matching-paren-on-screen t)
-  (show-paren-style 'expression)
-  (blink-matching-paren-dont-ignore-comments t)
-  :config (show-paren-mode))
+;; (use-package paren
+;;   ;; "Highlighting for parens"
+;;   :custom
+;;   (show-paren-delay 0.3)
+;;   (blink-matching-paren t)
+;;   (blink-matching-paren-on-screen t)
+;;   (show-paren-style 'expression)
+;;   (blink-matching-paren-dont-ignore-comments t)
+;;   :config (show-paren-mode))
 
 ;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
 (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")

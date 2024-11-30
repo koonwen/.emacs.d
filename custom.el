@@ -3,8 +3,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("7922b14d8971cce37ddb5e487dbc18da5444c47f766178e5a4e72f90437c0711" default)))
+ '(package-selected-packages
+   '(expand-region iedit move-text crux key-chord magit helm-lsp lsp-treemacs flycheck yasnippet lsp-mode treemacs-projectile treemacs keycast which-key helm-projectile projectile helm-descbinds helm undo-tree smartparens company-quickhelp company auto-dim-other-buffers delight material-theme zenburn-theme twilight-bright-theme flatland-theme use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
