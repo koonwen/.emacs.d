@@ -46,7 +46,7 @@
   (global-hl-line-mode t)
 
   ;; Show line numbers on left column, only in prog mode
-  (add-hook 'prog-mode-hook display-line-numbers-mode)
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
   ;; Automatically revert when there are changes
   (global-auto-revert-mode t)
