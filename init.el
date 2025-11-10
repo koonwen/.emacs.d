@@ -289,7 +289,7 @@
 ;; Enable rich annotations using the Marginalia package
 (use-package marginalia
   ;; Install marginalia version 2.3 from git repository
-  :straight (consult :type git :host github :repo "minad/marginalia" :tag "2.3")
+  :straight (marginalia :type git :host github :repo "minad/marginalia" :tag "2.3")
   ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
   ;; available in the *Completions* buffer, add it to the
   ;; `completion-list-mode-map'.
